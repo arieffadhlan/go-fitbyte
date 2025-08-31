@@ -1,12 +1,12 @@
-# fitbyte
-Go app for second project of ProjectSprint
+# go-fitbyte
+Go app for ProjectSprint project
 
 # How to Run
 1. Clone the repo
 
    ```bash
-    git clone git@github.com:fatjan/fitbyte.git
-    cd fitbyte
+    git clone https://github.com/arieffadhlan/go-fitbyte.git
+    cd go-fitbyte
    ```
 
 2. Create `.env` file
@@ -16,7 +16,7 @@ Go app for second project of ProjectSprint
     cp .env-example .env
    ```
 
-3. Create database `fitbyte`
+3. Create database `go-fitbyte`
 
 4. Run the migration
 
