@@ -22,7 +22,6 @@ func getAppEnv() string {
 	if env == "" {
 		return "development"
 	}
-
 	return env
 }
 
@@ -31,6 +30,5 @@ func getAppPort() string {
 	if port == "" {
 		port = "3000"
 	}
-
 	return fmt.Sprintf(":%s", port)
 }

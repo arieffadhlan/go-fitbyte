@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os/signal"
 	"syscall"
 
@@ -21,30 +20,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := database.InitiateDBConnection(cfg)
+	db, err := database.InitDBConnection(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer database.CloseDBConnection(db)
 
 	appServer := app.NewServer(cfg, db)
 	go func() {
-		if err := appServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := appServer.Listen(cfg.App.Port); err != nil {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
 
 	<-ctx.Done()
+	log.Println("Shutting down gracefully, press Ctrl+C again to force")
 
-	stop()
-	log.Println("shutting down gracefully, press Ctrl+C again to force")
-
-	if err := database.CloseDBConnection(db); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := appServer.Shutdown(ctx); err != nil {
+	if err := appServer.Shutdown(); err != nil {
 		log.Fatal("Server forced to shutdown: ", err)
 	}
 
-	log.Println("Server exiting")
+	log.Println("Server exited")
 }

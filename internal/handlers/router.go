@@ -2,15 +2,16 @@ package handlers
 
 import (
 	"github.com/arieffadhlan/go-fitbyte/internal/config"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 )
 
-func SetupRouter(cfg *config.Config, db *sqlx.DB, r *gin.Engine) {
+func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"Status": "Welcome to Fitbyte"})
+	})
 
-	r.GET("/health-check", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "health 🇮🇩🇮🇩🇮🇩🇮🇩🇮🇩",
-		})
+	app.Get("/health-check", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"status": "Ok"})
 	})
 }

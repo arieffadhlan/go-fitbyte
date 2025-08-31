@@ -33,6 +33,5 @@ Go app for ProjectSprint project
 6. Health check
 
 ```bash
-curl http://localhost:3002/health-check
+curl http://localhost:{APP_PORT}/health-check
 ```
-
