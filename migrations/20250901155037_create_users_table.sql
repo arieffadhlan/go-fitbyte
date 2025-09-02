@@ -38,4 +38,7 @@ CREATE INDEX IF NOT EXISTS users_email_idx ON users USING HASH (email);
 -- +goose StatementBegin
 SELECT 'down SQL query';
 drop table if exists users;
+drop type if exists preference_enum;
+drop type if exists weight_unit_enum;
+drop type if exists height_unit_enum;
 -- +goose StatementEnd
