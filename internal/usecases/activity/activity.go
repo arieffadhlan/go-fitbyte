@@ -20,6 +20,49 @@ func NewUseCase(activityRepository activity.Repository) UseCase {
 	}
 }
 
+func (u *useCase) GetAllActivities(ctx context.Context) ([]*dto.ActivityResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	activities, err := u.activityRepository.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// convert activities to dto.ActivityResponse
+	activitiesResponse := make([]*dto.ActivityResponse, len(activities))
+	for i, activity := range activities {
+		activitiesResponse[i] = &dto.ActivityResponse{
+			ActivityId:        strconv.Itoa(activity.ID),
+			ActivityType:      activity.ActivityType,
+			DoneAt:            activity.DoneAt,
+			DurationInMinutes: activity.DurationInMin,
+			CaloriesBurned:    activity.CaloriesBurned,
+		}
+	}
+	return activitiesResponse, nil
+}
+
+func (u *useCase) GetActivityById(ctx context.Context, id int) (*dto.ActivityResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	activity, err := u.activityRepository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.ActivityResponse{
+		ActivityId:        strconv.Itoa(activity.ID),
+		ActivityType:      activity.ActivityType,
+		DoneAt:            activity.DoneAt,
+		DurationInMinutes: activity.DurationInMin,
+		CaloriesBurned:    activity.CaloriesBurned,
+	}, nil
+}
+
 func (u *useCase) PostActivity(ctx context.Context, activity *dto.ActivityRequest, userId int) (*dto.ActivityResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err

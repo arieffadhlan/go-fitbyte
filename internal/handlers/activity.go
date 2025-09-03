@@ -14,6 +14,8 @@ import (
 type ActivityHandler interface {
 	Post(fibCtx *fiber.Ctx) error
 	Update(fibCtx *fiber.Ctx) error
+	GetAll(fibCtx *fiber.Ctx) error
+	GetById(fibCtx *fiber.Ctx) error
 }
 
 type activityHandler struct {
@@ -22,6 +24,35 @@ type activityHandler struct {
 
 func NewActivityHandler(activityUseCase activity.UseCase) ActivityHandler {
 	return &activityHandler{activityUseCase}
+}
+
+func (r *activityHandler) GetAll(fibCtx *fiber.Ctx) error {
+	activities, err := r.activityUseCase.GetAllActivities(fibCtx.Context())
+	if err != nil {
+		return fibCtx.Status(exceptions.MapToHttpStatusCode(err)).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return fibCtx.Status(fiber.StatusOK).JSON(activities)
+}
+
+func (r *activityHandler) GetById(fibCtx *fiber.Ctx) error {
+	activityId := fibCtx.Params("id")
+	id, err := strconv.Atoi(activityId)
+	if err != nil {
+		return fibCtx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "activityId must be an integer",
+		})
+	}
+
+	activity, err := r.activityUseCase.GetActivityById(fibCtx.Context(), id)
+	if err != nil {
+		return fibCtx.Status(exceptions.MapToHttpStatusCode(err)).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return fibCtx.Status(fiber.StatusOK).JSON(activity)
 }
 
 func (r *activityHandler) Post(fibCtx *fiber.Ctx) error {

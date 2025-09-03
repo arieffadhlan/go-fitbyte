@@ -37,6 +37,8 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 	activityRouter := v1.Group("activity")
 	activityRouter.Post("/:user_id", activityHandler.Post)
 	activityRouter.Patch("/:id", activityHandler.Update)
+	activityRouter.Get("/", activityHandler.GetAll)
+	activityRouter.Get("/:id", activityHandler.GetById)
 
 	// Test
 	v1.Get("/test", jwt.Middleware(cfg.JwtSecret), func(c *fiber.Ctx) error {
