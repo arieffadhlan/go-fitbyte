@@ -18,6 +18,10 @@ DB_URL = postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?s
 # Targets
 .PHONY: migrate-up migrate-down migrate-status run
 
+create-migration:
+	@echo "Creating migration '$(name)'..."
+	$(GOOSE_CMD) -dir $(MIGRATIONS_DIR) create create_$(name)_table sql
+
 migrate-up:
 	@echo "Applying up migrations..."
 	$(GOOSE_CMD) -dir $(MIGRATIONS_DIR) postgres "$(DB_URL)" up
