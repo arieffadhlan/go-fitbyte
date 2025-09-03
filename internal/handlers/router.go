@@ -5,8 +5,10 @@ import (
 	"github.com/arieffadhlan/go-fitbyte/internal/pkg/jwt"
 	activityRepository "github.com/arieffadhlan/go-fitbyte/internal/repositories/activity"
 	AuthRepository "github.com/arieffadhlan/go-fitbyte/internal/repositories/auth"
+	profileRepository "github.com/arieffadhlan/go-fitbyte/internal/repositories/profile"
 	activityUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/activity"
 	AuthUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/auth"
+	profileUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/profile"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 
@@ -41,6 +43,17 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 	activityRouter.Patch("/:id", activityHandler.Update)
 	activityRouter.Get("/", activityHandler.GetAll)
 	activityRouter.Get("/:id", activityHandler.GetById)
+
+	// Profile routes
+	profileRepo := profileRepository.NewProfileRepository(db)
+	profileUsecase := profileUseCase.NewProfileUseCase(profileRepo)
+	profileHandler := NewProfileHandler(profileUsecase)
+
+	// TODO: Add JWT middleware protection when ready
+	// profileRouter := v1.Group("/user", jwt.Middleware(cfg.JwtSecret))
+	profileRouter := v1.Group("/user") // Temporarily without JWT middleware
+	profileRouter.Get("/", profileHandler.GetProfile)
+	profileRouter.Patch("/", profileHandler.UpdateProfile)
 
 	// Test
 	v1.Get("/test", jwt.Middleware(cfg.JwtSecret), func(c *fiber.Ctx) error {
