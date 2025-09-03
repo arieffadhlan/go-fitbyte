@@ -37,3 +37,11 @@ migrate-status:
 run:
 	@echo "Running the Go application..."
 	-$(GO_CMD) run ./cmd/fitbyte
+
+create-migration:
+	@if [ -z "$(name)" ]; then \
+		echo "⚠️  WARNING: You didn't provide a name for table"; \
+	else \
+		echo "Creating migration '$(name)'..."; \
+		$(GOOSE_CMD) -dir $(MIGRATIONS_DIR) create create_$(name)_table sql; \
+	fi
