@@ -22,7 +22,7 @@ CREATE TABLE users (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users CASCADE;
 DROP TYPE IF EXISTS preferences_enum;
 DROP TYPE IF EXISTS weight_unit_enum;
 DROP TYPE IF EXISTS height_unit_enum;
