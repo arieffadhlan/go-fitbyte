@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TYPE preferences_enum AS ENUM ('CARDIO', 'WEIGHT');
 CREATE TYPE weight_unit_enum AS ENUM ('KG', 'LBS');
-CREATE TYPE height_unit_enum AS ENUM ('CM', 'INC');
+CREATE TYPE height_unit_enum AS ENUM ('CM', 'INCH');
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
