@@ -9,6 +9,8 @@ import (
 	AuthUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/auth"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
+
+	FileUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/file"
 )
 
 func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
@@ -47,4 +49,10 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 			"email":  c.Locals("email"),
 		})
 	})
+
+	fileUsecase := FileUseCase.NewUseCase(*cfg)
+	fileHandler := NewFileHandler(fileUsecase)
+
+	fileRouter := v1.Group("/file")
+	fileRouter.Post("/", fileHandler.Post)
 }

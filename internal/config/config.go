@@ -11,6 +11,7 @@ type Config struct {
 	App       app
 	Aws       aws
 	JwtSecret string
+	Minio     minio
 }
 
 func LoadConfig() (*Config, error) {
@@ -21,6 +22,7 @@ func LoadConfig() (*Config, error) {
 		Aws:       loadAwsConfig(),
 		DB:        loadDatabaseConfig(),
 		JwtSecret: getEnv("JWT_SECRET", "defaultsecret"), // 🔑 baca dari env sekali
+		Minio:     loadMinioConfig(),
 	}, nil
 }
 
