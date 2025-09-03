@@ -17,6 +17,47 @@ func NewActivityRepository(db *sqlx.DB) Repository {
 	return &repository{db: db}
 }
 
+func (r *repository) GetById(ctx context.Context, id int) (*models.Activity, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	query := `
+		SELECT id, user_id, activity_type, done_at, duration_in_minutes, calories_burned FROM activities WHERE id = $1
+	`
+
+	activity := &models.Activity{}
+
+	err := r.db.QueryRowContext(ctx, query, id).Scan(&activity.ID, &activity.UserId, &activity.ActivityType, &activity.DoneAt, &activity.DurationInMin, &activity.CaloriesBurned)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, exceptions.ErrNotFound
+		}
+		return nil, err
+	}
+
+	return activity, nil
+}
+
+func (r *repository) GetAll(ctx context.Context) ([]*models.Activity, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	query := `
+		SELECT id, user_id, activity_type, done_at, duration_in_minutes, calories_burned FROM activities
+	`
+
+	activities := []*models.Activity{}
+
+	err := r.db.SelectContext(ctx, &activities, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return activities, nil
+}
+
 func (r *repository) Post(ctx context.Context, activity *models.Activity) (*models.Activity, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err

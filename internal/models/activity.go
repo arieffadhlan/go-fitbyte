@@ -20,7 +20,7 @@ type Activity struct {
 	UserId         int          `db:"user_id"`
 	ActivityType   ActivityType `db:"activity_type"`
 	DoneAt         string       `db:"done_at"`
-	DurationInMin  int          `db:"duration_in_min"`
+	DurationInMin  int          `db:"duration_in_minutes"`
 	CaloriesBurned int          `db:"calories_burned"`
 	CreatedAt      string       `db:"created_at"`
 	UpdatedAt      string       `db:"updated_at"`
