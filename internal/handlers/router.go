@@ -51,15 +51,15 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 
 	fileRouter := v1.Group("/file")
 	fileRouter.Post("/", fileHandler.Post)
-  
-  	// Profile routes
+
+	// Profile routes
 	profileRepo := profileRepository.NewProfileRepository(db)
 	profileUsecase := profileUseCase.NewProfileUseCase(profileRepo)
 	profileHandler := NewProfileHandler(profileUsecase)
 
 	// TODO: Add JWT middleware protection when ready
-	// profileRouter := v1.Group("/user", jwt.Middleware(cfg.JwtSecret))
-	profileRouter := v1.Group("/user") // Temporarily without JWT middleware
+	profileRouter := v1.Group("/user", jwt.Middleware(cfg.JwtSecret))
+	// profileRouter := v1.Group("/user") // Temporarily without JWT middleware
 	profileRouter.Get("/", profileHandler.GetProfile)
 	profileRouter.Patch("/", profileHandler.UpdateProfile)
 }

@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"strconv"
-
 	"github.com/arieffadhlan/go-fitbyte/internal/dto"
 	"github.com/arieffadhlan/go-fitbyte/internal/usecases/profile"
 	"github.com/gofiber/fiber/v2"
@@ -20,22 +18,22 @@ func NewProfileHandler(profileUseCase profile.ProfileUseCaseInterface) *ProfileH
 
 func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 	// TODO: Replace with JWT middleware authentication
-	// userID := c.Locals("id").(int)
+	userID := c.Locals("id").(int)
 
-	// Get user ID from query parameter for now
-	userIDStr := c.Query("user_id")
-	if userIDStr == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "user_id query parameter is required",
-		})
-	}
+	// // Get user ID from query parameter for now
+	// userIDStr := c.Query("user_id")
+	// if userIDStr == "" {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"error": "user_id query parameter is required",
+	// 	})
+	// }
 
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid user_id format",
-		})
-	}
+	// userID, err := strconv.Atoi(userIDStr)
+	// if err != nil {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"error": "Invalid user_id format",
+	// 	})
+	// }
 
 	profile, err := h.profileUseCase.GetProfile(c.Context(), userID)
 	if err != nil {
@@ -49,22 +47,22 @@ func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 
 func (h *ProfileHandler) UpdateProfile(c *fiber.Ctx) error {
 	// TODO: Replace with JWT middleware authentication
-	// userID := c.Locals("id").(int)
+	userID := c.Locals("id").(int)
 
 	// Get user ID from query parameter for now
-	userIDStr := c.Query("user_id")
-	if userIDStr == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "user_id query parameter is required",
-		})
-	}
+	// userIDStr := c.Query("user_id")
+	// if userIDStr == "" {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"error": "user_id query parameter is required",
+	// 	})
+	// }
 
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid user_id format",
-		})
-	}
+	// userID, err := strconv.Atoi(userIDStr)
+	// if err != nil {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"error": "Invalid user_id format",
+	// 	})
+	// }
 
 	var req dto.ProfileUpdateRequest
 	if err := c.BodyParser(&req); err != nil {
