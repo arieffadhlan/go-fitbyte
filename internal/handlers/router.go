@@ -34,17 +34,25 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 	authRouter.Post("/login", authHandler.Login)
 	authRouter.Post("/register", authHandler.Register)
 
+	handleAuthorization := jwt.Middleware(cfg.JwtSecret)
+
 	activityRepository := activityRepository.NewActivityRepository(db)
 	activityUseCase := activityUseCase.NewUseCase(activityRepository)
 	activityHandler := NewActivityHandler(activityUseCase)
 
-	activityRouter := v1.Group("activity")
-	activityRouter.Post("/:user_id", activityHandler.Post)
+	activityRouter := v1.Group("activity", handleAuthorization)
+	activityRouter.Post("/", activityHandler.Post)
 	activityRouter.Patch("/:id", activityHandler.Update)
 	activityRouter.Get("/", activityHandler.GetAll)
 	activityRouter.Get("/:id", activityHandler.GetById)
 
-	// Profile routes
+	fileUsecase := FileUseCase.NewUseCase(*cfg)
+	fileHandler := NewFileHandler(fileUsecase)
+
+	fileRouter := v1.Group("/file")
+	fileRouter.Post("/", fileHandler.Post)
+  
+  	// Profile routes
 	profileRepo := profileRepository.NewProfileRepository(db)
 	profileUsecase := profileUseCase.NewProfileUseCase(profileRepo)
 	profileHandler := NewProfileHandler(profileUsecase)
@@ -54,18 +62,4 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 	profileRouter := v1.Group("/user") // Temporarily without JWT middleware
 	profileRouter.Get("/", profileHandler.GetProfile)
 	profileRouter.Patch("/", profileHandler.UpdateProfile)
-
-	// Test
-	v1.Get("/test", jwt.Middleware(cfg.JwtSecret), func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"userID": c.Locals("userID"),
-			"email":  c.Locals("email"),
-		})
-	})
-
-	fileUsecase := FileUseCase.NewUseCase(*cfg)
-	fileHandler := NewFileHandler(fileUsecase)
-
-	fileRouter := v1.Group("/file")
-	fileRouter.Post("/", fileHandler.Post)
 }
