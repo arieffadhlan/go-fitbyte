@@ -77,15 +77,14 @@ func (r *activityHandler) Post(fibCtx *fiber.Ctx) error {
 		})
 	}
 
-	userIdStr := fibCtx.Params("user_id")
-	id, err := strconv.Atoi(userIdStr)
-	if err != nil {
+	userId, ok := fibCtx.Locals("id").(int)
+	if !ok {
 		return fibCtx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "user_id must be an integer",
+			"error": "user id cant be empty",
 		})
 	}
 
-	activityResponse, err := r.activityUseCase.PostActivity(fibCtx.Context(), &activityRequest, id)
+	activityResponse, err := r.activityUseCase.PostActivity(fibCtx.Context(), &activityRequest, userId)
 
 	if err != nil {
 		return fibCtx.Status(exceptions.MapToHttpStatusCode(err)).JSON(fiber.Map{
@@ -125,16 +124,14 @@ func (r *activityHandler) Update(fibCtx *fiber.Ctx) error {
 		})
 	}
 
-	// ! need update to get user is by jwt not query props
-	userId := fibCtx.Query("user_id")
-	id, err := strconv.Atoi(userId)
-	if err != nil {
+	userId, ok := fibCtx.Locals("id").(int)
+	if !ok {
 		return fibCtx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "user_id must be an integer",
+			"error": "user id cant be empty",
 		})
 	}
 
-	activityResponse, err := r.activityUseCase.UpdateActivity(fibCtx.Context(), &activityRequest, id, activityId)
+	activityResponse, err := r.activityUseCase.UpdateActivity(fibCtx.Context(), &activityRequest, userId, activityId)
 
 	if err != nil {
 		if err == exceptions.ErrNotFound {
