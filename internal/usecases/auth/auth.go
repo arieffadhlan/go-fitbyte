@@ -2,13 +2,13 @@ package auth
 
 import (
 	"context"
-	"errors"
 
-	"github.com/arieffadhlan/go-fitbyte/internal/config"
 	"github.com/arieffadhlan/go-fitbyte/internal/dto"
+	"github.com/arieffadhlan/go-fitbyte/internal/config"
 	"github.com/arieffadhlan/go-fitbyte/internal/models"
 	"github.com/arieffadhlan/go-fitbyte/internal/pkg/jwt"
 	"github.com/arieffadhlan/go-fitbyte/internal/pkg/security"
+	"github.com/arieffadhlan/go-fitbyte/internal/pkg/exceptions"
 	"github.com/arieffadhlan/go-fitbyte/internal/repositories/auth"
 )
 
@@ -31,7 +31,7 @@ func (uc *AuthUsecase) Register(ctx context.Context, req *dto.AuthRequest) (int,
 
 	hashedPassword, err := security.HashingPassword(req.Password)
 	if err != nil {
-		return 0, errors.New("failed to hash password")
+		return 0, exceptions.NewInternal("failed to hash password")
 	}
 
 	user := &models.User{
@@ -39,7 +39,7 @@ func (uc *AuthUsecase) Register(ctx context.Context, req *dto.AuthRequest) (int,
 		Password: hashedPassword,
 	}
 
-	id, err := uc.authRepository.Create(ctx, user)
+	id,err := uc.authRepository.Create(ctx, user)
 	if err != nil {
 		return 0, err
 	}
@@ -52,25 +52,26 @@ func (uc *AuthUsecase) Login(ctx context.Context, req *dto.AuthRequest) (*dto.Au
 		return nil, err
 	}
 
-	user, err := uc.authRepository.FindUserByEmail(ctx, req.Email)
+	usr, err := uc.authRepository.FindUserByEmail(ctx, req.Email)
 	if err != nil {
-		return nil, errors.New("user not found")
-	}
-	if user == nil {
-		return nil, errors.New("invalid email or password")
+		 return nil, exceptions.NewNotFound("user not found")
 	}
 
-	if err := security.ComparePassword(req.Password, user.Password); err != nil {
-		return nil, errors.New("invalid email or password")
+	if usr == nil {
+		 return nil, exceptions.NewNotFound("invalid email or password")
 	}
 
-	token, err := jwt.GenerateToken(user.ID, user.Email, uc.cfg.JwtSecret)
+	if err := security.ComparePassword(req.Password, usr.Password); err != nil {
+		 return nil, exceptions.NewNotFound("invalid email or password")
+	}
+
+	token, err := jwt.GenerateToken(usr.ID, usr.Email, uc.cfg.JwtSecret)
 	if err != nil {
-		return nil, errors.New("failed to generate token")
+		 return nil, exceptions.NewInternal("failed to generate tokens")
 	}
 
 	return &dto.AuthResponse{
-		Email: user.Email,
+		Email: usr.Email,
 		Token: token,
 	}, nil
 }

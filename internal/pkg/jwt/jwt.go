@@ -14,7 +14,6 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// GenerateToken membuat JWT baru
 func GenerateToken(id int, email, secret string) (string, error) {
 	claims := &Claims{
 		ID:    id,
@@ -29,21 +28,22 @@ func GenerateToken(id int, email, secret string) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
-// ParseToken memvalidasi JWT dan mengembalikan claims
 func ParseToken(tokenStr, secret string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(t *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
+
 	if err != nil {
 		return nil, err
 	}
-	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		return claims, nil
+
+	if clm, ok := token.Claims.(*Claims); ok && token.Valid {
+		return clm, nil
 	}
+	
 	return nil, jwt.ErrTokenInvalidClaims
 }
 
-// Middleware Fiber untuk validasi JWT
 func Middleware(secret string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
@@ -56,21 +56,20 @@ func Middleware(secret string) fiber.Handler {
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "invalid authorization header format",
+				"error": "invalid authorization header",
 			})
 		}
 
 		token := parts[1]
-		claims, err := ParseToken(token, secret)
+		claim, err := ParseToken(token, secret)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "invalid or expired token",
 			})
 		}
 
-		// simpan ke context untuk handler berikutnya
-		c.Locals("id", claims.ID)
-		c.Locals("email", claims.Email)
+		c.Locals("id", claim.ID)
+		c.Locals("email", claim.Email)
 
 		return c.Next()
 	}

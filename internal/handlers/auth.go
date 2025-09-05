@@ -5,6 +5,7 @@ import (
 
 	"github.com/arieffadhlan/go-fitbyte/internal/dto"
 	"github.com/arieffadhlan/go-fitbyte/internal/usecases/auth"
+	"github.com/arieffadhlan/go-fitbyte/internal/pkg/exceptions"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,39 +19,39 @@ func NewAuthHandler(uc *auth.AuthUsecase) *AuthHandler {
 
 func (ah *AuthHandler) Register(ctx *fiber.Ctx) error {
 	var req dto.AuthRequest
+	
 	if err := ctx.BodyParser(&req); err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid request payload",
-		})
+		 return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "invalid request payload"})
 	}
 
-	id, err := ah.uc.Register(ctx.Context(), &req)
+	_, err := ah.uc.Register(ctx.Context(), &req)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		if appErr, ok := err.(*exceptions.AppError); ok {
+			return ctx.Status(appErr.Code).JSON(appErr)
+		} else {
+			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		}
 	}
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"id":    id,
-		"email": req.Email,
+		"message": "User registered successfully",
 	})
 }
 
 func (ah *AuthHandler) Login(ctx *fiber.Ctx) error {
 	var req dto.AuthRequest
 	if err := ctx.BodyParser(&req); err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid request payload",
-		})
+		 return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "invalid request payload"})
 	}
 
-	res, err := ah.uc.Login(ctx.Context(), &req)
+	r, err := ah.uc.Login(ctx.Context(), &req)
 	if err != nil {
-		return ctx.Status(http.StatusUnauthorized).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		if appErr, ok := err.(*exceptions.AppError); ok {
+			return ctx.Status(appErr.Code).JSON(appErr)
+		} else {
+			return ctx.Status(http.StatusUnauthorized).JSON(fiber.Map{"message": err.Error()})
+		}
 	}
 
-	return ctx.JSON(res)
+	return ctx.JSON(r)
 }
