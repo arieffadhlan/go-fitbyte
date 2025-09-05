@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"regexp"
+	
 	"github.com/arieffadhlan/go-fitbyte/internal/pkg/exceptions"
 )
 
@@ -14,9 +16,15 @@ type AuthResponse struct {
 	Token string `json:"token"`
 }
 
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+
 func (a *AuthRequest) Validate() error {
 	if a.Email == "" || a.Password == "" {
 		return exceptions.NewBadRequest("email and password are required")
+	}
+
+	if !emailRegex.MatchString(a.Email) {
+		return exceptions.NewBadRequest("invalid email format")
 	}
 
 	passLen := len(a.Password)

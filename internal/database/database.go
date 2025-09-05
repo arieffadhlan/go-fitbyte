@@ -20,7 +20,7 @@ func InitDBConnection(cfg *config.Config) (*sqlx.DB, error) {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	db.SetMaxOpenConns(25)
+	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
