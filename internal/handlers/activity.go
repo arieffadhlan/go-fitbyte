@@ -109,7 +109,7 @@ func (r *activityHandler) Update(fibCtx *fiber.Ctx) error {
 		})
 	}
 
-	var activityRequest dto.ActivityRequest
+	var activityRequest dto.ActivityUpdateRequest
 	if err := fibCtx.BodyParser(&activityRequest); err != nil {
 		return fibCtx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),

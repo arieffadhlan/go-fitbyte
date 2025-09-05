@@ -7,9 +7,15 @@ import (
 )
 
 type ActivityRequest struct {
-	ActivityType      models.ActivityType `validate:"required,oneof=Walking Yoga Stretching Cycling Swimming Dancing Hiking Running HIIT JumpRope"`
-	DoneAt            string              `validate:"required,iso8601"`
-	DurationInMinutes int                 `validate:"required,gte=1"`
+	ActivityType      models.ActivityType `json:"activityType" validate:"required,oneof=Walking Yoga Stretching Cycling Swimming Dancing Hiking Running HIIT JumpRope"`
+	DoneAt            string              `json:"doneAt" validate:"required,iso8601"`
+	DurationInMinutes int                 `json:"durationInMinutes" validate:"required,gte=1"`
+}
+
+type ActivityUpdateRequest struct {
+	ActivityType      *models.ActivityType `json:"activityType,omitempty" validate:"omitempty,oneof=Walking Yoga Stretching Cycling Swimming Dancing Hiking Running HIIT JumpRope"`
+	DoneAt            *string              `json:"doneAt,omitempty" validate:"omitempty,iso8601"`
+	DurationInMinutes *int                 `json:"durationInMinutes,omitempty" validate:"omitempty,gte=1"`
 }
 
 type ActivityQueryParamRequest struct {
