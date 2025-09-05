@@ -94,7 +94,7 @@ func (u *useCase) PostActivity(ctx context.Context, activity *dto.ActivityReques
 	}, nil
 }
 
-func (u *useCase) UpdateActivity(ctx context.Context, updatedActivity *dto.ActivityRequest, userID int, activityID string) (*dto.ActivityResponse, error) {
+func (u *useCase) UpdateActivity(ctx context.Context, updatedActivity *dto.ActivityUpdateRequest, userID int, activityID string) (*dto.ActivityResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
@@ -108,11 +108,45 @@ func (u *useCase) UpdateActivity(ctx context.Context, updatedActivity *dto.Activ
 		return nil, err
 	}
 
+	// Fetch only if we need fallback values
+	var existing *models.Activity
+	if updatedActivity.ActivityType == nil || updatedActivity.DurationInMinutes == nil || updatedActivity.DoneAt == nil {
+		existing, err = u.activityRepository.GetById(ctx, activityIdInt)
+		if err != nil {
+			if err == exceptions.ErrNotFound {
+				return nil, exceptions.ErrNotFound
+			}
+			return nil, err
+		}
+	}
+
+	// Merge final values
+	var finalActivityType models.ActivityType
+	if updatedActivity.ActivityType != nil {
+		finalActivityType = *updatedActivity.ActivityType
+	} else {
+		finalActivityType = existing.ActivityType
+	}
+
+	var finalDuration int
+	if updatedActivity.DurationInMinutes != nil {
+		finalDuration = *updatedActivity.DurationInMinutes
+	} else {
+		finalDuration = existing.DurationInMin
+	}
+
+	var finalDoneAt string
+	if updatedActivity.DoneAt != nil {
+		finalDoneAt = *updatedActivity.DoneAt
+	} else {
+		finalDoneAt = existing.DoneAt
+	}
+
 	updatePayloadActivity := &models.Activity{
-		ActivityType:   updatedActivity.ActivityType,
-		DoneAt:         updatedActivity.DoneAt,
-		DurationInMin:  updatedActivity.DurationInMinutes,
-		CaloriesBurned: updatedActivity.ActivityType.GetTotalCalories(updatedActivity.DurationInMinutes),
+		ActivityType:   finalActivityType,
+		DoneAt:         finalDoneAt,
+		DurationInMin:  finalDuration,
+		CaloriesBurned: finalActivityType.GetTotalCalories(finalDuration),
 		ID:             activityIdInt,
 		UserId:         userID,
 	}
