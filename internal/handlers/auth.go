@@ -24,7 +24,7 @@ func (ah *AuthHandler) Register(ctx *fiber.Ctx) error {
 		 return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "invalid request payload"})
 	}
 
-	_, err := ah.uc.Register(ctx.Context(), &req)
+	r, err := ah.uc.Register(ctx.Context(), &req)
 	if err != nil {
 		if appErr, ok := err.(*exceptions.AppError); ok {
 			return ctx.Status(appErr.Code).JSON(appErr)
@@ -33,9 +33,7 @@ func (ah *AuthHandler) Register(ctx *fiber.Ctx) error {
 		}
 	}
 
-	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
-		"message": "User registered successfully",
-	})
+	return ctx.JSON(r)
 }
 
 func (ah *AuthHandler) Login(ctx *fiber.Ctx) error {

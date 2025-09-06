@@ -24,14 +24,14 @@ func NewAuthUsecase(authRepository auth.Repository, cfg *config.Config) *AuthUse
 	}
 }
 
-func (uc *AuthUsecase) Register(ctx context.Context, req *dto.AuthRequest) (int, error) {
+func (uc *AuthUsecase) Register(ctx context.Context, req *dto.AuthRequest) (*dto.AuthResponse, error) {
 	if err := req.Validate(); err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	hashedPassword, err := security.HashingPassword(req.Password)
 	if err != nil {
-		return 0, exceptions.NewInternal("failed to hash password")
+		return nil, exceptions.NewInternal("failed to hash password")
 	}
 
 	user := &models.User{
@@ -41,10 +41,18 @@ func (uc *AuthUsecase) Register(ctx context.Context, req *dto.AuthRequest) (int,
 
 	id,err := uc.authRepository.Create(ctx, user)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return id, nil
+	token, err := jwt.GenerateToken(id, req.Email, uc.cfg.JwtSecret)
+	if err != nil {
+		 return nil, exceptions.NewInternal("failed to generate tokens")
+	}
+
+	return &dto.AuthResponse{
+		Email: req.Email,
+		Token: token,
+	}, nil
 }
 
 func (uc *AuthUsecase) Login(ctx context.Context, req *dto.AuthRequest) (*dto.AuthResponse, error) {
