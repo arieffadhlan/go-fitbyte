@@ -7,4 +7,5 @@ import (
 
 type UseCase interface {
 	UploadFile(context.Context, *multipart.FileHeader, multipart.File, string) (string, error)
+	DeleteFile(context.Context, string) error
 }

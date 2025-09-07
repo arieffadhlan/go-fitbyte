@@ -5,9 +5,11 @@ import (
 	"github.com/arieffadhlan/go-fitbyte/internal/pkg/jwt"
 	activityRepository "github.com/arieffadhlan/go-fitbyte/internal/repositories/activity"
 	AuthRepository "github.com/arieffadhlan/go-fitbyte/internal/repositories/auth"
+	UserRepository "github.com/arieffadhlan/go-fitbyte/internal/repositories/user"
 	profileRepository "github.com/arieffadhlan/go-fitbyte/internal/repositories/profile"
 	activityUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/activity"
 	AuthUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/auth"
+	UserUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/user"
 	profileUseCase "github.com/arieffadhlan/go-fitbyte/internal/usecases/profile"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
@@ -46,8 +48,11 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 	activityRouter.Get("/", activityHandler.GetAll)
 	activityRouter.Get("/:id", activityHandler.GetById)
 
+	userRepo := UserRepository.NewUserRepository(db)
+	userUsecase := UserUseCase.NewUserUsecase(userRepo)
+
 	fileUsecase := FileUseCase.NewUseCase(*cfg)
-	fileHandler := NewFileHandler(fileUsecase)
+	fileHandler := NewFileHandler(fileUsecase, userUsecase)
 
 	fileRouter := v1.Group("/file", handleAuthorization)
 	fileRouter.Post("/", fileHandler.Post)

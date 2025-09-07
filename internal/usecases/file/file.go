@@ -54,3 +54,15 @@ func (uc *useCase) UploadFile(ctx context.Context, file *multipart.FileHeader, s
 
 	return presignedURL.String(), nil
 }
+
+
+func (uc *useCase) DeleteFile(ctx context.Context, objectName string) error {
+	bucketName := uc.config.Minio.BucketName
+
+	return uc.minio.RemoveObject(
+		ctx,
+		bucketName,
+		objectName,
+		minio.RemoveObjectOptions{},
+	)
+}
