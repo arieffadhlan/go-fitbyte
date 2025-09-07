@@ -6,7 +6,7 @@ import (
 	"github.com/arieffadhlan/go-fitbyte/internal/models"
 )
 
-type Repository interface {
+type AuthRepositoryInterface interface {
 	Create(context.Context, *models.User) (int, error)
 	FindUserByEmail(context.Context, string) (*models.User, error)
 }

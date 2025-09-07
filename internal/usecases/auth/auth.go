@@ -12,19 +12,19 @@ import (
 	"github.com/arieffadhlan/go-fitbyte/internal/repositories/auth"
 )
 
-type AuthUsecase struct {
-	authRepository auth.Repository
+type AuthUseCase struct {
+	authRepository auth.AuthRepositoryInterface
 	cfg            *config.Config
 }
 
-func NewAuthUsecase(authRepository auth.Repository, cfg *config.Config) *AuthUsecase {
-	return &AuthUsecase{
+func NewAuthUseCase(authRepository auth.AuthRepositoryInterface, cfg *config.Config) AuthUseCaseInterface {
+	return &AuthUseCase{
 		authRepository: authRepository,
 		cfg:            cfg,
 	}
 }
 
-func (uc *AuthUsecase) Register(ctx context.Context, req *dto.AuthRequest) (*dto.AuthResponse, error) {
+func (uc *AuthUseCase) Register(ctx context.Context, req *dto.AuthRequest) (*dto.AuthResponse, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (uc *AuthUsecase) Register(ctx context.Context, req *dto.AuthRequest) (*dto
 	}, nil
 }
 
-func (uc *AuthUsecase) Login(ctx context.Context, req *dto.AuthRequest) (*dto.AuthResponse, error) {
+func (uc *AuthUseCase) Login(ctx context.Context, req *dto.AuthRequest) (*dto.AuthResponse, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}

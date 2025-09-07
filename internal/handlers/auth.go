@@ -9,11 +9,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type AuthHandler struct {
-	uc *auth.AuthUsecase
+type AuthHandlerInterface interface {
+	Login(ctx *fiber.Ctx) error
+	Register(ctx *fiber.Ctx) error
 }
 
-func NewAuthHandler(uc *auth.AuthUsecase) *AuthHandler {
+type AuthHandler struct {
+	uc auth.AuthUseCaseInterface
+}
+
+func NewAuthHandler(uc auth.AuthUseCaseInterface) AuthHandlerInterface {
 	return &AuthHandler{uc: uc}
 }
 

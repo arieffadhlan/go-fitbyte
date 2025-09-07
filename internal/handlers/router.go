@@ -27,7 +27,7 @@ func SetupRouter(cfg *config.Config, db *sqlx.DB, app *fiber.App) {
 	v1 := app.Group("/api/v1")
 
 	authRepo := AuthRepository.NewAuthRepository(db)
-	authUsecase := AuthUseCase.NewAuthUsecase(authRepo, cfg)
+	authUsecase := AuthUseCase.NewAuthUseCase(authRepo, cfg)
 	authHandler := NewAuthHandler(authUsecase)
 
 	authRouter := v1.Group("")
