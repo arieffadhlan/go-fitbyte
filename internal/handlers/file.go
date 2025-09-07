@@ -38,7 +38,7 @@ func (r *fileHandler) Post(ctx *fiber.Ctx) error {
 
 	src, err := file.Open()
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 	defer src.Close()
 
